@@ -21,6 +21,7 @@ const upload = multer({
         bucket: myBucket,
         metadata: function(req, file, cb) {
 
+            console.log('1');
             cb(null, { filedName: file.fieldname });
         },
         key: function(req, file, cb) {

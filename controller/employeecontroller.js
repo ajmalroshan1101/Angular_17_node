@@ -27,13 +27,16 @@ const employee = {
 
         const employeeName = req.body.employeeName;
 
+        console.log(req.body);
         const profilePicture = req.file ? req.file.location : null;
 
+        console.log(profilePicture);
+        const status = 0;
 
         const { totalWeight, deliveryDate, productType, design, styleCode, quantity, weightExpected, size, currentDate } = req.body;
 
-        const query = `INSERT INTO tbl_order_creation (employee_name, product_type, design, qty, style_code, size, total_wgt, wgt_expected, curt_date, delivery_date ,image) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,?)`;
-        const values = [employeeName, productType, design, quantity, styleCode, size, totalWeight, weightExpected, currentDate, deliveryDate, profilePicture];
+        const query = `INSERT INTO tbl_order_creation (employee_name, product_type, design, qty, style_code, size, total_wgt, wgt_expected, curt_date, delivery_date ,image,status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,?,?)`;
+        const values = [employeeName, productType, design, quantity, styleCode, size, totalWeight, weightExpected, currentDate, deliveryDate, profilePicture, status];
 
         connection.query(query, values, (err, result) => {
             if (err) {
@@ -48,7 +51,7 @@ const employee = {
     //order getting fucntion
     getorder: (req, res) => {
 
-        const query = `SELECT * FROM tbl_order_creation`
+        const query = `SELECT * FROM tbl_order_creation WHERE status = 0`
 
         connection.query(query, (err, result) => {
             if (err) {
@@ -58,6 +61,38 @@ const employee = {
                 return;
             }
 
+            res.json(result);
+        })
+    },
+
+    get_on_going_order: (req, res) => {
+
+        const query = `SELECT * FROM tbl_order_creation o
+        LEFT JOIN hm_department hm ON (o.department = 1 AND o.sub_department = hm.hm_department_id)
+        LEFT JOIN tbl_casting_dept cd ON (o.department = 2 AND o.sub_department = cd.casting_dept_id)
+        WHERE o.status = 2;`
+
+        connection.query(query, (err, result) => {
+            if (err) {
+                console.error("Error inserting data:", err.message);
+                res.status(500).json({ error: "Internal Server Error" });
+                return;
+            }
+            res.json(result)
+        })
+    },
+    delected_request: (req, res) => {
+
+        const query = `SELECT * FROM 
+        tbl_order_creation  WHERE status = 1`
+
+
+        connection.query(query, (err, result) => {
+            if (err) {
+                console.error("Error inserting data:", err.message);
+                res.status(500).json({ error: "Internal Server Error" });
+                return;
+            }
             res.json(result);
         })
     }

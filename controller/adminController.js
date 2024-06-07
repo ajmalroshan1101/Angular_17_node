@@ -17,9 +17,19 @@ const admin = {
             state,
             username,
             password,
+            department
         } = req.body.obj;
 
         const role = req.body.role
+        console.log(department);
+
+        let depid = 0
+        if (department === 'HANDMADE') {
+            depid = 1
+        } else if (department === 'CASTING') {
+            depid = 2
+        }
+
 
         const hashedPass = crypto.createHash("md5").update(password).digest("hex");
 
@@ -30,11 +40,12 @@ const admin = {
             state,
             username,
             hashedPass,
-            role
+            role,
+            depid
         ];
 
-        const query = `INSERT INTO tbl_login (customer_name, customer_service_area, reporting_branch, state, username, password,role) 
-        VALUES (?, ?, ?, ?, ?, ?,?)`;
+        const query = `INSERT INTO tbl_login (customer_name, customer_service_area, reporting_branch, state, username, password,role,department) 
+        VALUES (?, ?, ?, ?, ?, ?,?,?)`;
 
         connection.query(query, values, (error, results) => {
             if (error) {
@@ -181,12 +192,16 @@ const admin = {
     //customer login
     login: (req, res) => {
 
+        console.log('kl');
 
         const { username, password } = req.body;
 
         const hashedPass = crypto.createHash("md5").update(password).digest("hex");
 
-        const query = `SELECT customer_no , customer_name ,username,password,role FROM tbl_login WHERE username = ? AND password = ?`;
+        const query = `SELECT customer_no , customer_name ,username,password,tbl_role.role,department
+        FROM tbl_login
+        LEFT JOIN tbl_role ON tbl_role.role_id = tbl_login.role
+        WHERE username = ? AND password = ? `;
 
         connection.query(query, [username, hashedPass], (err, result) => {
             if (err) {
@@ -197,8 +212,12 @@ const admin = {
 
             // Check if results array is not empty
             if (result.length > 0) {
+
                 const user = result[0]; // Get the first (and presumably only) row
 
+                console.log(user);
+                console.log(user.role);
+                console.log(user.department);
                 const payload = {
                     id: user.customer_no,
                     name: user.customer_name,
@@ -232,6 +251,80 @@ const admin = {
             }
 
             res.json(result);
+        })
+    },
+
+    viewproduct: (req, res) => {
+        const id = req.body.id
+
+        const query = `SELECT * FROM tbl_order_creation WHERE order_no = ?`
+
+        connection.query(query, [id], (err, result) => {
+            if (err) {
+                console.error("Error inserting data:", err.message);
+                res.status(500).json({ error: "Internal Server Error" });
+                return;
+            }
+
+            res.json(result);
+        })
+    },
+
+    orderedit: (req, res) => {
+        console.log(req.body);
+        const image = req.file ? req.file.location : null;
+        console.log(image);
+
+        const { product_type, style_code, design, qty, size, total_wgt, wgt_expected } = req.body
+
+        const sentid = parseInt(req.body.sentid);
+
+        const values = [product_type, design, qty, style_code, size, total_wgt, wgt_expected, image, sentid]
+        const query = `UPDATE tbl_order_creation
+        SET product_type=?, design=?, qty=?, style_code=?, size=?, total_wgt=?, wgt_expected=?, image=?
+        WHERE order_no = ?`
+
+        connection.query(query, values, (err, result) => {
+            if (err) {
+                console.error("Error inserting data:", err.message);
+                res.status(500).json({ error: "Internal Server Error" });
+                return;
+            }
+
+            res.json('successfull')
+        })
+    },
+
+    orderdelete: (req, res) => {
+        const id = req.body.id
+
+        const query = `UPDATE tbl_order_creation SET status = 1 WHERE order_no = ?`
+
+        connection.query(query, [id], (err, result) => {
+            if (err) {
+                console.error("Error inserting data:", err.message);
+                res.status(500).json({ error: "Internal Server Error" });
+                return;
+            }
+
+            res.json('deleted successful')
+        })
+    },
+    departmentTrasfer: (req, res) => {
+        const { id, order } = req.body
+
+        console.log(id, order);
+
+        const value = [id, order]
+        const query = `UPDATE tbl_order_creation SET status = 2, department = ? WHERE order_no = ?`
+
+        connection.query(query, value, (err, result) => {
+            if (err) {
+                console.error("Error inserting data:", err.message);
+                res.status(500).json({ error: "Internal Server Error" });
+                return;
+            }
+            res.json(result)
         })
     }
 };

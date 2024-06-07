@@ -13,9 +13,14 @@ const {
     selectreportingbranch,
     select_state,
     login,
-    getproduct
+    getproduct,
+    viewproduct,
+    orderedit,
+    orderdelete,
+    departmentTrasfer
 } = require("../controller/adminController");
 const admin = require("../controller/adminController");
+const { upload } = require("../utility/s3multer");
 
 adminroute.post("/creatcustomer", createCustomer);
 
@@ -44,6 +49,14 @@ adminroute.get('/slstate', select_state);
 
 adminroute.post('/login', login)
 
-adminroute.get('/getproduct', getproduct)
+adminroute.get('/getproduct', getproduct);
+
+adminroute.post('/viewproduct', viewproduct);
+
+adminroute.post('/orderedit', upload.single('file'), orderedit)
+
+adminroute.post('/orderdelete', orderdelete);
+
+adminroute.post('/departmenttransfer', departmentTrasfer)
 
 module.exports = adminroute;

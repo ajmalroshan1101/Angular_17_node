@@ -6,6 +6,7 @@ const adminroute = require('./routes/adminRoutes');
 
 const employeeroute = require('./routes/employeeRoutes');
 
+const departmentRoutes = require('./routes/departmentroutes');
 
 app.use(bodyParser.urlencoded({ extended: false }));
 
@@ -15,11 +16,11 @@ app.use(bodyParser.json());
 
 app.use(cors());
 
-app.use('/admin', adminroute)
+app.use('/admin', adminroute);
 
-app.use('/employee', employeeroute)
+app.use('/employee', employeeroute);
 
-
+app.use('/department', departmentRoutes);
 
 app.get('/', (req, res) => {
     res.send('node is working')
