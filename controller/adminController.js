@@ -192,8 +192,6 @@ const admin = {
     //customer login
     login: (req, res) => {
 
-        console.log('kl');
-
         const { username, password } = req.body;
 
         const hashedPass = crypto.createHash("md5").update(password).digest("hex");
@@ -215,9 +213,9 @@ const admin = {
 
                 const user = result[0]; // Get the first (and presumably only) row
 
-                console.log(user);
-                console.log(user.role);
-                console.log(user.department);
+                // console.log(user);
+                // console.log(user.role);
+                // console.log(user.department);
                 const payload = {
                     id: user.customer_no,
                     name: user.customer_name,
@@ -271,9 +269,9 @@ const admin = {
     },
 
     orderedit: (req, res) => {
-        console.log(req.body);
+        // console.log(req.body);
         const image = req.file ? req.file.location : null;
-        console.log(image);
+        // console.log(image);
 
         const { product_type, style_code, design, qty, size, total_wgt, wgt_expected } = req.body
 
@@ -313,7 +311,7 @@ const admin = {
     departmentTrasfer: (req, res) => {
         const { id, order } = req.body
 
-        console.log(id, order);
+        // console.log(id, order);
 
         const value = [id, order]
         const query = `UPDATE tbl_order_creation SET status = 2, department = ? WHERE order_no = ?`

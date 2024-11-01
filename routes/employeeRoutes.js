@@ -24,7 +24,9 @@ employee.get('/getorder', getorder);
 employee.post('/selectdesign', selectdesign);
 
 //Order createing Function
-employee.post('/ordercreation', upload.single('file'), ordercreation);
+// employee.post('/ordercreation', upload.single('file'), ordercreation);
+// employee.post('/ordercreation', upload.fields([{ name: 'file' }, { name: 'file2' }, { name: 'file3' }]), ordercreation);
+employee.post('/ordercreation', upload.array('files'), ordercreation);
 
 employee.get('/ongoingorder', get_on_going_order);
 

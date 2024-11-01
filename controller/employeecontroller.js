@@ -27,16 +27,20 @@ const employee = {
 
         const employeeName = req.body.employeeName;
 
-        console.log(req.body);
-        const profilePicture = req.file ? req.file.location : null;
 
-        console.log(profilePicture);
+        const files = req.files;
+
+        const locations = files.map(file => file.location).join(', ');
+
+        // const profilePicture = req.file ? req.file.location : null;
+
+
         const status = 0;
 
         const { totalWeight, deliveryDate, productType, design, styleCode, quantity, weightExpected, size, currentDate } = req.body;
 
         const query = `INSERT INTO tbl_order_creation (employee_name, product_type, design, qty, style_code, size, total_wgt, wgt_expected, curt_date, delivery_date ,image,status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,?,?)`;
-        const values = [employeeName, productType, design, quantity, styleCode, size, totalWeight, weightExpected, currentDate, deliveryDate, profilePicture, status];
+        const values = [employeeName, productType, design, quantity, styleCode, size, totalWeight, weightExpected, currentDate, deliveryDate, locations, status];
 
         connection.query(query, values, (err, result) => {
             if (err) {
@@ -44,6 +48,7 @@ const employee = {
                 res.status(500).json({ error: 'Internal Server Error' });
                 return;
             }
+            console.log('done');
             res.json('success');
         });
     },
